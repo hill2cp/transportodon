@@ -182,16 +182,15 @@
       // TODO redirect to a sharable link by completing the steps below
 
       // 1. get the current state from localStorage
-      let currState = localStorage.getItem('items');
-
+      let array = localStorage.getItem('items');
       // 2. create a URLSearchParams object from the data you retrieved from localStorage
-      let searchParam = new URLSearchParams({q: currState});
+      let searchParam = new URLSearchParams( {p: array});
       // 3. get the current url from window.location
-      let currURL = window.location.href;
-      // 4. set the current url's search property to '?' concatenated with: the urlsearchparams object's tostring 
-      currURL.search = "?" + searchParam.toString();
+      let url1 = window.location;
+      console.log(url1);
+      // 4. set the current url's search property to '?' concatenated with: the urlsearchparams object's tostring
+      url1.search = "?" + searchParam.toString();
       // 5. update the window.location to the result of the preceding step
-      window.location = currU
     })
 
     function populateLocalStorageFromURLSeach() {
@@ -199,6 +198,11 @@
       // TODO update from URL by completing the steps below:
       // 1. when the page loads, look to see if the url has a querystring that has the kind of data you added to it above
       // 2. if there is such data in the querystring, replace the state in localStorage with the data in the URL
+      if(window.location.search){
+        let Params = new URLSearchParams(window.location.search)
+        console.log(Params.getAll('p'));
+        localStorage.setItem("items", Params.getAll('p').split(',')[0]);
+      }
     }
 
     // initialize the page
@@ -216,22 +220,26 @@
 
       // TODO 1. get the current state from localStorage
       // I wanted mine to be an object with a single key (items) and then a parsed representation of the value from localStorage
-
+      let array = localStorage.getItem('items');
       // TODO 2. get the stringified version of the state from the previous step
-
+      let stringArray = JSON.stringify(array);
       // TODO 3. encode the state as a URI component
-
+      let encoded = encodeURIComponent(stringArray);
       // TODO 4. prepend the encoded string with the data URL dark magic:
       // 'data:application/json;charset=utf-8,'
       // ok, it's not really dark magic, read more here:
       // https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/Data_URLs
-
+      let prepended = 'data:application/json;charset=utf-8,' + encoded;
       // TODO 5. create a link which has as its href the result from the preceding step and its download attribute set to
       // "transportodons.json"
-
+      let createLink = document.createElement('link');
+      createLink.href = prepended;
+      createLink.download = "transportodons.json";
       // TODO 6. add the link to the downloads container in the provided html
-
+      let down = document.querySelector("#downloads");
+      down.appendChild(createLink);
       // TODO 7. write the javascript to click the newly added link
+      createLink.addEventListener('click', exportClick);
     }
 
     // when the import form is submitted...
@@ -245,28 +253,31 @@
       const importField = document.getElementById('import-file')
 
       // TODO 1. get the list of file objects selected by the user
-
+      let filesList = document.getElementById('import-file');
       // TODO 2. if there aren't any, alert a helpful message
-
+      if(filesList == null){
+        alert('No files found');
+      }
       // TODO 3. if there was at least 1 file, proceed with only the first file
-
+      let firstFile = filesList[0];
       // TODO 4. construct a new FileReader object
-
+      let reader = new FileReader();
       // TODO 5. add an event listener for the new FileReader's load event that will call the loadedJSON function below
-
+      reader.addEventListener('load', loadedJSON);
       // TODO 6. tell the filereader to read the file as text https://developer.mozilla.org/en-US/docs/Web/API/FileReader/readAsText
+      reader.readAsText(firstFile);
     }
 
     // callback for when the json file is loaded during import
     function loadedJSON(ev) {
       // TODO 7. get the event's target's result
-
+      let result = ev.target;
       // TODO 8. decode the result (recall that it was encoded for use as a URL during export above)
-
+      let decoded = decodeURIComponent(result);
       // TODO 9. the decoded value should be a JSON string, parse it.
-
+      let stringParsing = JSON.parse(decoded);
       // TODO 10. add the items from the parsed object into localstorage
-
+      localStorage.setItem('items', stringParsing);
       // update the list of todos based on the newly populated state in localStorage
       populateFromLocalStorage()
     }
