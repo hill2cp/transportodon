@@ -182,14 +182,16 @@
       // TODO redirect to a sharable link by completing the steps below
 
       // 1. get the current state from localStorage
+      let currState = localStorage.getItem('items');
 
       // 2. create a URLSearchParams object from the data you retrieved from localStorage
-
+      let searchParam = new URLSearchParams({q: currState});
       // 3. get the current url from window.location
-
+      let currURL = window.location.href;
       // 4. set the current url's search property to '?' concatenated with: the urlsearchparams object's tostring 
-
+      currURL.search = "?" + searchParam.toString();
       // 5. update the window.location to the result of the preceding step
+      window.location = currU
     })
 
     function populateLocalStorageFromURLSeach() {
